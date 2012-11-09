@@ -25,14 +25,14 @@ extern NSString* const InstagramErrorDomain;
     
 }
 
-@property(nonatomic, weak) id<IGRequestDelegate> delegate;
-@property(nonatomic, strong) NSString* url;
-@property(nonatomic, strong) NSString* httpMethod;
-@property(nonatomic, strong) NSMutableDictionary* params;
-@property(nonatomic, strong) NSURLConnection* connection;
-@property(nonatomic, strong) NSMutableData* responseText;
+@property(nonatomic, assign) id<IGRequestDelegate> delegate;
+@property(nonatomic, copy) NSString* url;
+@property(nonatomic, copy) NSString* httpMethod;
+@property(nonatomic, copy) NSMutableDictionary* params;
+@property(nonatomic, retain) NSURLConnection* connection;
+@property(nonatomic, retain) NSMutableData* responseText;
 @property(nonatomic, readonly) IGRequestState state;
-@property(nonatomic, strong) NSError* error;
+@property(nonatomic, retain) NSError* error;
 
 +(NSString*)serializeURL:(NSString*)baseUrl
                   params:(NSDictionary*)params;

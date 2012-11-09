@@ -40,11 +40,6 @@ static void *finishedContext = @"finishedContext";
 
 @implementation Instagram
 
-@synthesize accessToken = _accessToken;
-@synthesize sessionDelegate = _sessionDelegate;
-@synthesize scopes = _scopes;
-@synthesize clientId = _clientId;
-
 -(id)initWithClientId:(NSString*)clientId delegate:(id<IGSessionDelegate>)delegate {
     self = [super init];
     if (self) {
@@ -56,9 +51,15 @@ static void *finishedContext = @"finishedContext";
 }
 
 - (void)dealloc {
+    [_accessToken release];
+    [_sessionDelegate release];
+    [_scopes release];
+    [_clientId release];
+    
     for (IGRequest* request in _requests) {
         [_requests removeObserver:self forKeyPath:requestFinishedKeyPath];
     }
+    [super dealloc];
 }
 
 #pragma mark - internal

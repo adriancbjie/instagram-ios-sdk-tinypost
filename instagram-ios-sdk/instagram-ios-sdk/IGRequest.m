@@ -7,7 +7,8 @@
 //
 
 #import "IGRequest.h"
-#import "JSON.h"
+#import "SBJSON.h"
+//#import <FacebookSDK/FacebookSDK.h>
 
 
 static NSString* kUserAgent = @"InstagramConnect";
@@ -27,14 +28,16 @@ NSString* const InstagramErrorDomain = @"instagramErrorDomain";
 
 @implementation IGRequest
 
-@synthesize url = _url;
-@synthesize delegate = _delegate;
-@synthesize httpMethod = _httpMethod;
-@synthesize params = _params;
-@synthesize connection = _connection;
-@synthesize responseText = _responseText;
-@synthesize state = _state;
-@synthesize error = _error;
+- (void)dealloc {
+    [_url release];
+    [_httpMethod release];
+    [_params release];
+    [_connection release];
+    [_responseText release];
+    [_error release];
+    
+    [super dealloc];
+}
 
 
 #pragma mark - static
@@ -78,12 +81,14 @@ NSString* const InstagramErrorDomain = @"instagramErrorDomain";
             continue;
         }
         
-        NSString* escaped_value = (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
+        CFStringRef paramsString = (CFStringRef)[params objectForKey:key];
+        NSString* escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(
                                                                                       NULL, /* allocator */
-                                                                                      (__bridge CFStringRef)[params objectForKey:key],
+                                                                                      paramsString,
                                                                                       NULL, /* charactersToLeaveUnescaped */
                                                                                       (CFStringRef)@"!*'();:@&=$,/?%#[]",
                                                                                       kCFStringEncodingUTF8);
+        CFRelease(paramsString);
         
         [pairs addObject:[NSString stringWithFormat:@"%@=%@", key, escaped_value]];
     }
@@ -133,7 +138,7 @@ NSString* const InstagramErrorDomain = @"instagramErrorDomain";
                                data:[NSString stringWithFormat:
                                      @"Content-Disposition: form-data; filename=\"%@\"\r\n", key]];
                 [self utfAppendBody:body
-                               data:[NSString stringWithString:@"Content-Type: image/png\r\n\r\n"]];
+                               data:@"Content-Type: image/png\r\n\r\n"];
                 [body appendData:imageData];
             } else {
                 NSAssert([dataParam isKindOfClass:[NSData class]],
@@ -142,7 +147,7 @@ NSString* const InstagramErrorDomain = @"instagramErrorDomain";
                                data:[NSString stringWithFormat:
                                      @"Content-Disposition: form-data; filename=\"%@\"\r\n", key]];
                 [self utfAppendBody:body
-                               data:[NSString stringWithString:@"Content-Type: content/unknown\r\n\r\n"]];
+                               data:@"Content-Type: content/unknown\r\n\r\n"];
                 [body appendData:(NSData*)dataParam];
             }
             [self utfAppendBody:body data:endLine];
@@ -162,7 +167,7 @@ NSString* const InstagramErrorDomain = @"instagramErrorDomain";
     
     NSString* responseString = [[NSString alloc] initWithData:data
                                                      encoding:NSUTF8StringEncoding];
-    SBJSON *jsonParser = [SBJSON new]; 
+    SBJSON *jsonParser = [SBJSON new];
     id result = [jsonParser objectWithString:responseString];
     NSDictionary* meta = (NSDictionary*)[result objectForKey:@"meta"];
     if ( meta && [[meta objectForKey:@"code"] integerValue] == 200) {

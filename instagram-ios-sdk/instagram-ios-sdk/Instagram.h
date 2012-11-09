@@ -14,8 +14,8 @@
     NSMutableSet* _requests;
 }
 
-@property(nonatomic, strong) NSString* accessToken;
-@property(nonatomic, weak) id<IGSessionDelegate> sessionDelegate;
+@property(nonatomic, copy) NSString* accessToken;
+@property(nonatomic, assign) id<IGSessionDelegate> sessionDelegate;
 
 -(id)initWithClientId:(NSString*)clientId delegate:(id<IGSessionDelegate>)delegate;
 
