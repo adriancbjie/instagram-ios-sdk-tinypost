@@ -81,14 +81,12 @@ NSString* const InstagramErrorDomain = @"instagramErrorDomain";
             continue;
         }
         
-        CFStringRef paramsString = (CFStringRef)[params objectForKey:key];
         NSString* escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(
                                                                                       NULL, /* allocator */
-                                                                                      paramsString,
+                                                                                      (CFStringRef)[params objectForKey:key],
                                                                                       NULL, /* charactersToLeaveUnescaped */
                                                                                       (CFStringRef)@"!*'();:@&=$,/?%#[]",
                                                                                       kCFStringEncodingUTF8);
-        CFRelease(paramsString);
         
         [pairs addObject:[NSString stringWithFormat:@"%@=%@", key, escaped_value]];
     }
